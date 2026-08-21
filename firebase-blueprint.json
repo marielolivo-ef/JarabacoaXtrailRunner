@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "Runner": {
+      "title": "Runner",
+      "description": "A race participant",
+      "type": "object",
+      "properties": {
+        "userName": { "type": "string", "maxLength": 50 },
+        "startTime": { "type": "number" },
+        "penalties": { "type": "number" },
+        "completedStations": { "type": "array", "maxLength": 10 },
+        "updatedAt": { "type": "timestamp" }
+      },
+      "required": ["userName", "startTime", "penalties", "completedStations", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/runners/{runnerId}": {
+      "schema": { "$ref": "#/entities/Runner" },
+      "description": "Active runners in the race"
+    }
+  }
+}

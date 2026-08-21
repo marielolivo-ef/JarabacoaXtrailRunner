@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidRunner(data) {
+      return data.keys().hasAll(['userName', 'startTime', 'penalties', 'completedStations', 'updatedAt'])
+        && data.keys().size() == 5
+        && data.userName is string && data.userName.size() > 0 && data.userName.size() <= 50
+        && data.startTime is number
+        && data.penalties is number
+        && data.completedStations is list && data.completedStations.size() <= 10
+        && data.updatedAt is timestamp;
+    }
+
+    match /runners/{runnerId} {
+      allow list: if resource.data.startTime is number;
+      allow get: if isValidId(runnerId);
+
+      allow create: if isValidId(runnerId)
+        && isValidRunner(incoming())
+        && incoming().updatedAt == request.time;
+
+      allow update: if isValidId(runnerId)
+        && isValidRunner(incoming())
+        && incoming().startTime == existing().startTime
+        && incoming().updatedAt == request.time;
+    }
+  }
+}

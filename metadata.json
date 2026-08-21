@@ -1,0 +1,10 @@
+{
+  "name": "Jarabacoa X-Trail",
+  "description": "Ruta runner interactiva con estaciones NFC, medalla de realidad aumentada y pizarra de tiempos.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

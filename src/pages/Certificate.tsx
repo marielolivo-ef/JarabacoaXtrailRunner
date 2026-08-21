@@ -59,19 +59,42 @@ export default function Certificate() {
   };
 
   const handleShare = async () => {
-    if (navigator.share) {
+    const text = `¡Completé la Ruta Runner de Jarabacoa X-Trail! 10/10 estaciones. 🏃‍♂️💨\n\nÚnete al reto aquí: ${window.location.origin}`;
+    
+    if (certificateRef.current) {
       try {
-        await navigator.share({
-          title: 'Certificado Jarabacoa X-Trail',
-          text: `¡Completé la Ruta Runner de Jarabacoa X-Trail! 10/10 estaciones.`,
-          url: window.location.origin,
+        const dataUrl = await toPng(certificateRef.current, {
+          quality: 1,
+          pixelRatio: 2,
+          backgroundColor: '#000000',
         });
+        
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], 'certificado.png', { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Certificado Jarabacoa X-Trail',
+            text: text,
+          });
+          return;
+        } else if (navigator.share) {
+          await navigator.share({
+            title: 'Certificado Jarabacoa X-Trail',
+            text: text,
+            url: window.location.origin,
+          });
+          return;
+        }
       } catch (err) {
-        console.log('Error sharing', err);
+        console.error('Error sharing', err);
       }
-    } else {
-      alert("¡Ruta completada! Comparte esto con tus amigos.");
     }
+
+    // Fallback if Web Share API is not available (like on desktop)
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleDownload = async () => {
@@ -199,7 +222,7 @@ export default function Certificate() {
           onClick={handleShare}
           className="px-8 py-4 bg-[#00F0FF] text-black font-black italic uppercase text-sm rounded-full flex justify-center items-center gap-2 hover:scale-105 transition-transform shadow-[0_10px_30px_rgba(0,240,255,0.3)] flex-1 min-w-[200px]"
         >
-          <Share2 className="w-5 h-5" /> Compartir
+          <Share2 className="w-5 h-5" /> Compartir en IG / WA
         </button>
         <button 
           onClick={handleReset}

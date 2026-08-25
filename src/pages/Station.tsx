@@ -135,19 +135,7 @@ export default function Station() {
     }
 
     if (completedStations.length === 10) {
-      const timeMs = getDuration();
-      if (timeMs) {
-        try {
-          await fetch('https://script.google.com/macros/s/AKfycbzuFJI2YwOcCluwkwS0y7_9jwdSxBsJOR2Y1k0G2uKSZQtdJJtUmUjd0UqzDKS6gyomuQ/exec', {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ name: userName, time: timeMs })
-          });
-        } catch (error) {
-          console.error("Failed to submit score", error);
-        }
-      }
-      navigate('/');
+      navigate('/station/11');
     } else {
       navigate('/');
     }

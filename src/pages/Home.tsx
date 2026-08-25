@@ -113,9 +113,12 @@ export default function Home() {
                 <p className="text-sm font-medium text-gray-200 mb-6 relative z-10">
                   Has completado las 10 estaciones de la montaña. Tu último desafío es dirigirte físicamente a la <strong className="text-[#CCFF00]">META (Estación 11)</strong>.
                 </p>
-                <div className="inline-block px-5 py-3 bg-black/60 rounded-xl border border-[#00F0FF]/50 text-xs font-bold text-[#00F0FF] uppercase tracking-widest animate-pulse relative z-10">
+                <div className="inline-block px-5 py-3 bg-black/60 rounded-xl border border-[#00F0FF]/50 text-xs font-bold text-[#00F0FF] uppercase tracking-widest animate-pulse relative z-10 mb-4">
                   Escanea el NFC de la Meta para ver tu Medalla 3D
                 </div>
+                <Link to="/station/11" className="block w-full max-w-xs mx-auto py-3 bg-[#CCFF00] text-black font-black uppercase italic rounded-full text-center hover:scale-105 transition-transform shadow-[0_10px_30px_rgba(204,255,0,0.3)]">
+                  SIMULAR NFC DE META
+                </Link>
               </div>
             ) : (
               <div className="p-4 bg-[#FF007A]/10 border border-[#FF007A]/30 rounded-2xl">

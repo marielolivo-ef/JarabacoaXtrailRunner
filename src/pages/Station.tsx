@@ -147,7 +147,7 @@ export default function Station() {
           console.error("Failed to submit score", error);
         }
       }
-      navigate('/certificate');
+      navigate('/');
     } else {
       navigate('/');
     }

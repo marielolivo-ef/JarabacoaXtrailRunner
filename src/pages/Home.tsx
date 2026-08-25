@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../AppContext';
 import { motion } from 'motion/react';
-import { Nfc } from 'lucide-react';
-
+import { Nfc, LogOut, MapPin, Trophy } from 'lucide-react';
 import { Logo } from '../Logo';
 
 export default function Home() {
-  const { userName, setUserName, completedStations, startTimer, startTime } = useAppContext();
+  const { userName, setUserName, completedStations, startTimer, startTime, resetProgress } = useAppContext();
   const [nameInput, setNameInput] = useState(userName);
   const navigate = useNavigate();
 
@@ -19,19 +18,14 @@ export default function Home() {
       if (!startTime) {
         startTimer();
       }
-
-      // Find first uncompleted station or default to 1
-      const nextStation = Array.from({length: 10}, (_, i) => i + 1).find(
-        (id) => !completedStations.includes(id)
-      ) || 1;
-      
-      if (completedStations.length === 10) {
-        navigate('/certificate');
-      } else {
-        navigate(`/station/${nextStation}`);
-      }
+      // Do not navigate to the station automatically to prevent cheating!
+      // They must scan the NFC tag to access the station.
     }
   };
+
+  const nextStation = Array.from({length: 10}, (_, i) => i + 1).find(
+    (id) => !completedStations.includes(id)
+  ) || 1;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative z-10 overflow-hidden">
@@ -57,40 +51,92 @@ export default function Home() {
           </Link>
         </div>
 
-        {completedStations.length > 0 && completedStations.length < 10 && (
-          <div className="mb-6 p-4 bg-white/10 border border-white/20 rounded-2xl">
-            <p className="text-[#CCFF00] text-center text-sm font-bold uppercase tracking-widest">
-              NFC Activado: {completedStations.length}/10 Estaciones
-            </p>
+        {!userName ? (
+          <form onSubmit={handleStart} className="space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-xs uppercase font-bold tracking-widest text-gray-400 mb-2">
+                Ingresa tu nombre runner
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="Ej. María Pérez"
+                className="w-full px-4 py-4 bg-black/50 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#CCFF00] transition-all font-medium uppercase"
+              />
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="w-full font-black uppercase text-sm italic text-black py-4 bg-[#CCFF00] rounded-full shadow-[0_10px_30px_rgba(204,255,0,0.3)] transition-all flex items-center justify-center gap-2"
+            >
+              Comenzar Ruta
+              <Nfc className="w-5 h-5" />
+            </motion.button>
+          </form>
+        ) : (
+          <div className="space-y-6 text-center">
+            <div className="p-6 bg-white/10 border border-white/20 rounded-3xl">
+              <div className="text-xs uppercase font-bold tracking-widest text-gray-400 mb-1">Corredor Activo</div>
+              <div className="text-2xl font-black italic text-white uppercase">{userName}</div>
+              
+              <div className="mt-6 flex justify-between items-center border-t border-white/10 pt-6">
+                <div>
+                  <div className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Progreso</div>
+                  <div className="text-3xl font-black italic text-[#CCFF00]">{completedStations.length}/10</div>
+                </div>
+                {completedStations.length < 10 ? (
+                  <div className="text-right">
+                    <div className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Próximo Destino</div>
+                    <div className="text-lg font-black italic text-white flex items-center justify-end gap-1">
+                      <MapPin className="w-4 h-4 text-[#FF007A]" /> Estación {nextStation}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-right">
+                    <div className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Estado</div>
+                    <div className="text-lg font-black italic text-[#CCFF00] flex items-center justify-end gap-1">
+                      <Trophy className="w-4 h-4" /> Completado
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {completedStations.length === 10 ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/certificate')}
+                className="w-full font-black uppercase text-sm italic text-black py-4 bg-[#CCFF00] rounded-full shadow-[0_10px_30px_rgba(204,255,0,0.3)] transition-all flex items-center justify-center gap-2"
+              >
+                Ver Mi Certificado
+                <Trophy className="w-5 h-5" />
+              </motion.button>
+            ) : (
+              <div className="p-4 bg-[#FF007A]/10 border border-[#FF007A]/30 rounded-2xl">
+                <p className="text-sm font-bold text-white mb-2">¡Busca la siguiente estación!</p>
+                <p className="text-xs text-gray-300">
+                  Debes caminar hacia la Estación {nextStation} y escanear su código NFC (o acceder a su enlace) físicamente para poder avanzar.
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                resetProgress();
+                setNameInput('');
+              }}
+              className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-[#FF007A] transition-colors flex items-center justify-center gap-2 mx-auto mt-4"
+            >
+              <LogOut className="w-4 h-4" />
+              Salir del Reto (Borrar Progreso)
+            </button>
           </div>
         )}
-
-        <form onSubmit={handleStart} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-xs uppercase font-bold tracking-widest text-gray-400 mb-2">
-              Ingresa tu nombre runner
-            </label>
-            <input
-              id="name"
-              type="text"
-              required
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Ej. María Pérez"
-              className="w-full px-4 py-4 bg-black/50 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#CCFF00] transition-all font-medium uppercase"
-            />
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="w-full font-black uppercase text-sm italic text-black py-4 bg-[#CCFF00] rounded-full shadow-[0_10px_30px_rgba(204,255,0,0.3)] transition-all flex items-center justify-center gap-2"
-          >
-            {completedStations.length > 0 ? "Continuar Ruta" : "Comenzar Ruta"}
-            <Nfc className="w-5 h-5" />
-          </motion.button>
-        </form>
       </motion.div>
 
       <div className="mt-8 relative z-10 text-center space-y-4 flex flex-col">

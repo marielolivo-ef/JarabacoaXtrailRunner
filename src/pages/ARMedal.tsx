@@ -151,12 +151,20 @@ export default function ARMedal() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-12 z-20 text-center w-full px-6"
+          className="absolute bottom-12 z-20 text-center w-full px-6 flex flex-col items-center gap-4"
         >
-          <h2 className="text-3xl font-black italic uppercase text-white drop-shadow-lg mb-2">¡Medalla Desbloqueada!</h2>
-          <p className="text-[#CCFF00] font-bold text-sm tracking-widest uppercase drop-shadow-md bg-black/50 py-2 px-6 inline-block rounded-full backdrop-blur-md">
-            Realidad Aumentada - Estación 11
-          </p>
+          <div>
+            <h2 className="text-3xl font-black italic uppercase text-white drop-shadow-lg mb-2">¡Medalla Desbloqueada!</h2>
+            <p className="text-[#CCFF00] font-bold text-sm tracking-widest uppercase drop-shadow-md bg-black/50 py-2 px-6 inline-block rounded-full backdrop-blur-md">
+              Realidad Aumentada - Estación 11
+            </p>
+          </div>
+          <Link 
+            to="/certificate" 
+            className="px-8 py-4 bg-[#CCFF00] text-black font-black italic uppercase text-sm rounded-full shadow-[0_10px_30px_rgba(204,255,0,0.3)] hover:scale-105 active:scale-95 transition-transform"
+          >
+            Obtener Certificado Oficial
+          </Link>
         </motion.div>
       )}
 

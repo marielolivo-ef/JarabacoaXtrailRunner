@@ -319,7 +319,7 @@ export default function Station() {
               <>COMPLETAR RUTA <Trophy className="w-5 h-5" /></>
             ) : (
               <>
-                {!unlocked && !isCompleted ? 'SUPERA LA PRUEBA' : isCompleted ? (completedStations.length === 10 ? 'VER CERTIFICADO' : 'IR AL MAPA') : 'MARCAR ESTACIÓN'}
+                {!unlocked && !isCompleted ? 'SUPERA LA PRUEBA' : isCompleted ? (completedStations.length === 10 ? 'IR A LA META' : 'IR AL MAPA') : 'MARCAR ESTACIÓN'}
                 {unlocked && <ArrowRight className="w-5 h-5" />}
               </>
             )}

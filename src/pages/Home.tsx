@@ -97,9 +97,9 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="text-right">
-                    <div className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Estado</div>
+                    <div className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Próximo Destino</div>
                     <div className="text-lg font-black italic text-[#CCFF00] flex items-center justify-end gap-1">
-                      <Trophy className="w-4 h-4" /> Completado
+                      <Trophy className="w-4 h-4" /> LA META
                     </div>
                   </div>
                 )}
@@ -107,15 +107,16 @@ export default function Home() {
             </div>
 
             {completedStations.length === 10 ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/certificate')}
-                className="w-full font-black uppercase text-sm italic text-black py-4 bg-[#CCFF00] rounded-full shadow-[0_10px_30px_rgba(204,255,0,0.3)] transition-all flex items-center justify-center gap-2"
-              >
-                Ver Mi Certificado
-                <Trophy className="w-5 h-5" />
-              </motion.button>
+              <div className="p-6 bg-gradient-to-r from-[#FF007A]/20 to-[#CCFF00]/20 border border-[#CCFF00]/50 rounded-3xl text-center relative overflow-hidden">
+                <Trophy className="w-12 h-12 text-[#CCFF00] mx-auto mb-3 drop-shadow-[0_0_15px_rgba(204,255,0,0.8)] relative z-10" />
+                <h3 className="text-2xl font-black italic text-white uppercase mb-2 relative z-10">¡Ruta Superada!</h3>
+                <p className="text-sm font-medium text-gray-200 mb-6 relative z-10">
+                  Has completado las 10 estaciones de la montaña. Tu último desafío es dirigirte físicamente a la <strong className="text-[#CCFF00]">META (Estación 11)</strong>.
+                </p>
+                <div className="inline-block px-5 py-3 bg-black/60 rounded-xl border border-[#00F0FF]/50 text-xs font-bold text-[#00F0FF] uppercase tracking-widest animate-pulse relative z-10">
+                  Escanea el NFC de la Meta para ver tu Medalla 3D
+                </div>
+              </div>
             ) : (
               <div className="p-4 bg-[#FF007A]/10 border border-[#FF007A]/30 rounded-2xl">
                 <p className="text-sm font-bold text-white mb-2">¡Busca la siguiente estación!</p>

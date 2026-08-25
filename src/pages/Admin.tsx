@@ -1,8 +1,10 @@
 import { useAppContext } from '../AppContext';
-import { Copy, MapPin, CheckCircle2, Lock, Edit2, Save, X, QrCode } from 'lucide-react';
-import React, { useState } from 'react';
+import { Copy, MapPin, CheckCircle2, Lock, Edit2, Save, X, QrCode, Users, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { db } from '../lib/firebase';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 export default function Admin() {
   const { stationsData, updateStationQuiz } = useAppContext();
@@ -17,7 +19,40 @@ export default function Admin() {
   const [editOptions, setEditOptions] = useState<string[]>(['', '', '']);
   const [editCorrectIndex, setEditCorrectIndex] = useState(0);
 
-  const [activeTab, setActiveTab] = useState<'stations' | 'qrcodes'>('stations');
+  const [activeTab, setActiveTab] = useState<'stations' | 'qrcodes' | 'runners'>('stations');
+  const [runners, setRunners] = useState<any[]>([]);
+  const [loadingRunners, setLoadingRunners] = useState(false);
+
+  const fetchRunners = async () => {
+    setLoadingRunners(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'runners'));
+      const fetchedRunners = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setRunners(fetchedRunners);
+    } catch (err) {
+      console.error("Error fetching runners", err);
+    } finally {
+      setLoadingRunners(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'runners') {
+      fetchRunners();
+    }
+  }, [activeTab, isAuthenticated]);
+
+  const handleDeleteRunner = async (id: string) => {
+    if (window.confirm("¿Seguro que deseas eliminar a este participante de la pizarra?")) {
+      try {
+        await deleteDoc(doc(db, 'runners', id));
+        setRunners(runners.filter(r => r.id !== id));
+      } catch (err) {
+        console.error("Error deleting runner", err);
+        alert("Error al eliminar corredor.");
+      }
+    }
+  };
 
   const ADMIN_PASSWORD = 'runnerjarabacoa';
 
@@ -111,6 +146,9 @@ export default function Admin() {
           </button>
           <button onClick={() => setActiveTab('qrcodes')} className={`px-8 py-3 rounded-full font-black italic uppercase text-sm transition-all text-center border border-white/20 flex items-center justify-center gap-2 ${activeTab === 'qrcodes' ? 'bg-[#00F0FF] text-black shadow-[0_5px_20px_rgba(0,240,255,0.4)]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
             <QrCode className="w-4 h-4" /> Códigos QR
+          </button>
+          <button onClick={() => setActiveTab('runners')} className={`px-8 py-3 rounded-full font-black italic uppercase text-sm transition-all text-center border border-white/20 flex items-center justify-center gap-2 ${activeTab === 'runners' ? 'bg-[#FF007A] text-white shadow-[0_5px_20px_rgba(255,0,122,0.4)]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+            <Users className="w-4 h-4" /> Runners
           </button>
           <Link to="/leaderboard" className="px-8 py-3 bg-[#00F0FF] text-black hover:bg-[#00F0FF]/80 rounded-full font-black italic uppercase text-sm shadow-[0_5px_20px_rgba(0,240,255,0.4)] transition-all hover:scale-105 active:scale-95 text-center">
             Ver Pizarra
@@ -227,7 +265,7 @@ export default function Admin() {
           )
         })}
       </main>
-      ) : (
+      ) : activeTab === 'qrcodes' ? (
         <main className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 relative z-10 max-w-7xl mx-auto w-full bg-white text-black p-8 rounded-3xl print:p-0 print:bg-transparent">
           <div className="col-span-full flex justify-between items-center mb-4 print:hidden">
             <h2 className="text-2xl font-black italic uppercase text-[#FF007A]">Imprimir Códigos QR</h2>
@@ -247,6 +285,35 @@ export default function Admin() {
             <QRCodeSVG value={`${window.location.origin}/station/11`} size={150} fgColor="#FF007A" />
             <p className="text-[10px] mt-2 font-mono text-center break-all text-[#FF007A]">{`${window.location.origin}/station/11`}</p>
           </div>
+        </main>
+      ) : (
+        <main className="relative z-10 max-w-4xl mx-auto w-full bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[32px]">
+          <h2 className="text-2xl font-black italic uppercase text-white mb-6">Corredores Registrados</h2>
+          {loadingRunners ? (
+            <div className="text-[#CCFF00] font-black italic text-center py-10 animate-pulse">Cargando corredores...</div>
+          ) : runners.length === 0 ? (
+            <div className="text-gray-400 font-bold uppercase tracking-widest text-center py-10">No hay corredores registrados.</div>
+          ) : (
+            <div className="space-y-4">
+              {runners.map(runner => (
+                <div key={runner.id} className="bg-black/50 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-xl font-black italic uppercase text-white">{runner.userName}</div>
+                    <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+                      Completadas: <span className="text-[#CCFF00]">{runner.completedStations?.length || 0}/10</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteRunner(runner.id)}
+                    className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors"
+                    title="Eliminar Corredor"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </main>
       )}
 

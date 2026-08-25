@@ -28,6 +28,7 @@ service cloud.firestore {
         && isValidRunner(incoming())
         && incoming().startTime == existing().startTime
         && incoming().updatedAt == request.time;
+      allow delete: if isValidId(runnerId);
     }
   }
 }

@@ -3,15 +3,19 @@ import { Link } from 'react-router-dom';
 import { Camera, Medal, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import confetti from 'canvas-confetti';
-
 import { Logo } from '../Logo';
+import { useAppContext } from '../AppContext';
 
 export default function ARMedal() {
+  const { markCompleted, completedStations } = useAppContext();
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(false);
   const [showMedal, setShowMedal] = useState(false);
 
   useEffect(() => {
+    if (completedStations.length >= 10) {
+      markCompleted(11);
+    }
     // Start camera when component mounts
     const startCamera = async () => {
       try {

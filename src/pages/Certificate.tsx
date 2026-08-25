@@ -8,7 +8,7 @@ import { toPng } from 'html-to-image';
 import { Logo } from '../Logo';
 
 export default function Certificate() {
-  const { userName, completedStations, resetProgress } = useAppContext();
+  const { userName, completedStations, resetProgress, markCompleted } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
   const isPreview = new URLSearchParams(location.search).get('preview') === 'true';
@@ -22,7 +22,9 @@ export default function Certificate() {
     // Only show if actually completed or in preview
     if (!isPreview && completedStations.length < 10 && process.env.NODE_ENV !== 'development') {
       navigate('/'); 
+      return;
     }
+    markCompleted(11);
 
     if (!hasTriggeredConfetti.current) {
       const duration = 3 * 1000;

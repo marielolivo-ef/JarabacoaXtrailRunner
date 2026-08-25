@@ -143,7 +143,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (prev.includes(id)) return prev;
       const newState = [...prev, id];
       localStorage.setItem('jarabacoa_completed', JSON.stringify(newState));
-      if (newState.length === 10 && !endTime) {
+      if (newState.length >= 11 && !endTime) {
         const now = Date.now();
         setEndTime(now);
         localStorage.setItem('jarabacoa_endtime', now.toString());

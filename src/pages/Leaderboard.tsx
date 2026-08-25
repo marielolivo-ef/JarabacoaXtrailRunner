@@ -23,8 +23,8 @@ export default function Leaderboard() {
           };
         });
         
-        // Filter those who completed all 10 stations
-        const completedRunners = runners.filter(r => r.completedStations.length >= 10);
+        // Filter those who completed all 11 stations (including META/Certificate)
+        const completedRunners = runners.filter(r => r.completedStations.length >= 11);
         // Sort by fastest time
         completedRunners.sort((a, b) => a.time - b.time);
         

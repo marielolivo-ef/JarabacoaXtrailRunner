@@ -138,9 +138,9 @@ export default function Station() {
       const timeMs = getDuration();
       if (timeMs) {
         try {
-          await fetch('/api/leaderboard', {
+          await fetch('https://script.google.com/macros/s/AKfycbzuFJI2YwOcCluwkwS0y7_9jwdSxBsJOR2Y1k0G2uKSZQtdJJtUmUjd0UqzDKS6gyomuQ/exec', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ name: userName, time: timeMs })
           });
         } catch (error) {

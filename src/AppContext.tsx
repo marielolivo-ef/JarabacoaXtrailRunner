@@ -55,6 +55,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const saved = localStorage.getItem('jarabacoa_penalties');
     return saved ? parseInt(saved, 10) : 0;
   });
+  const [endTime, setEndTime] = useState<number | null>(() => {
+    const saved = localStorage.getItem('jarabacoa_endtime');
+    return saved ? parseInt(saved, 10) : null;
+  });
 
   // Pull from Firebase on mount
   useEffect(() => {
@@ -71,6 +75,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           if (data.startTime) {
             setStartTime(data.startTime);
             localStorage.setItem('jarabacoa_starttime', data.startTime.toString());
+          }
+          if (data.endTime) {
+            setEndTime(data.endTime);
+            localStorage.setItem('jarabacoa_endtime', data.endTime.toString());
           }
           if (data.penalties !== undefined) {
             setPenalties(data.penalties);
@@ -96,22 +104,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setDoc(doc(db, 'runners', runnerId), {
         userName,
         startTime,
+        endTime,
         penalties,
         completedStations,
         updatedAt: serverTimestamp()
       }, { merge: true }).catch(err => console.error("Firebase write error:", err));
     }
-  }, [isInitialized, runnerId, userName, startTime, penalties, completedStations]);
+  }, [isInitialized, runnerId, userName, startTime, endTime, penalties, completedStations]);
 
   const startTimer = () => {
     const now = Date.now();
     setStartTime(now);
+    setEndTime(null);
     localStorage.setItem('jarabacoa_starttime', now.toString());
+    localStorage.removeItem('jarabacoa_endtime');
   };
 
   const getDuration = () => {
     if (!startTime) return null;
-    return (Date.now() - startTime) + penalties;
+    return ((endTime || Date.now()) - startTime) + penalties;
   };
 
   const addPenalty = (ms: number) => {
@@ -132,6 +143,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (prev.includes(id)) return prev;
       const newState = [...prev, id];
       localStorage.setItem('jarabacoa_completed', JSON.stringify(newState));
+      if (newState.length === 10 && !endTime) {
+        const now = Date.now();
+        setEndTime(now);
+        localStorage.setItem('jarabacoa_endtime', now.toString());
+      }
       return newState;
     });
   };
@@ -148,11 +164,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setUserNameState('');
     setCompletedStations([]);
     setStartTime(null);
+    setEndTime(null);
     setPenalties(0);
     localStorage.removeItem('jarabacoa_username');
     localStorage.removeItem('jarabacoa_completed');
     localStorage.removeItem('jarabacoa_starttime');
+    localStorage.removeItem('jarabacoa_endtime');
     localStorage.removeItem('jarabacoa_penalties');
+    localStorage.removeItem('jarabacoa_runnerid');
+    const newId = 'runner-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    setRunnerId(newId);
+    localStorage.setItem('jarabacoa_runnerid', newId);
   };
 
   return (

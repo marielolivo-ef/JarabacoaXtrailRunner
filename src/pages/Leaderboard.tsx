@@ -18,7 +18,7 @@ export default function Leaderboard() {
             id: doc.id,
             name: data.userName,
             completedStations: data.completedStations || [],
-            time: data.startTime ? (data.updatedAt?.toMillis ? (data.updatedAt.toMillis() - data.startTime + (data.penalties || 0)) : 0) : 0,
+            time: data.startTime ? (data.endTime ? (data.endTime - data.startTime + (data.penalties || 0)) : (data.updatedAt?.toMillis ? (data.updatedAt.toMillis() - data.startTime + (data.penalties || 0)) : 0)) : 0,
             startTime: data.startTime
           };
         });

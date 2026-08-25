@@ -121,11 +121,20 @@ export default function Station() {
   const handleComplete = async () => {
     if (!unlocked && !isCompleted) return;
 
-    markCompleted(station.id);
-    window.speechSynthesis.cancel();
-    setIsPlaying(false);
-    
-    if (completedStations.length + (isCompleted ? 0 : 1) === 10) {
+    if (!isCompleted) {
+      markCompleted(station.id);
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#CCFF00', '#FF007A', '#00F0FF', '#FFFF00']
+      });
+      return;
+    }
+
+    if (completedStations.length === 10) {
       const timeMs = getDuration();
       if (timeMs) {
         try {
@@ -140,8 +149,7 @@ export default function Station() {
       }
       navigate('/certificate');
     } else {
-      const nextId = station.id < 10 ? station.id + 1 : 1;
-      navigate(`/station/${nextId}`);
+      navigate('/');
     }
   };
 
@@ -311,7 +319,7 @@ export default function Station() {
               <>COMPLETAR RUTA <Trophy className="w-5 h-5" /></>
             ) : (
               <>
-                {!unlocked && !isCompleted ? 'SUPERA LA PRUEBA' : isCompleted ? 'SIGUIENTE ESTACIÓN' : 'MARCAR ESTACIÓN'}
+                {!unlocked && !isCompleted ? 'SUPERA LA PRUEBA' : isCompleted ? (completedStations.length === 10 ? 'VER CERTIFICADO' : 'IR AL MAPA') : 'MARCAR ESTACIÓN'}
                 {unlocked && <ArrowRight className="w-5 h-5" />}
               </>
             )}
